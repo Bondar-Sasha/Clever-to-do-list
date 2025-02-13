@@ -1,5 +1,6 @@
 import {FC} from 'react'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
+// import {onAuthStateChanged} from 'firebase/auth'
 
 import {
   HomePage,
@@ -10,9 +11,15 @@ import {
   NotFoundPage,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
+// import {auth} from '@/Shared'
 
 const AppRoutes: FC = () => {
-  const userId = true
+  // const [isAuth, setIsAuth] = useState<boolean>(false)
+
+  // onAuthStateChanged(auth, (user) => {
+  //   // setIsAuth(!!user)
+  // })
+
   return (
     <BrowserRouter>
       <Routes>
@@ -20,7 +27,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/create_task"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!userId}>
+            <SecureRoute redirectTo="/" isRedirection={!isAuth}>
               <CreateTaskPage />
             </SecureRoute>
           }
@@ -28,7 +35,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/edit_task"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!userId}>
+            <SecureRoute redirectTo="/" isRedirection={!isAuth}>
               <EditTaskPage />
             </SecureRoute>
           }
@@ -37,7 +44,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/registration"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!userId}>
+            <SecureRoute redirectTo="/" isRedirection={!!isAuth}>
               <RegisterPage />
             </SecureRoute>
           }
@@ -45,7 +52,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/login"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!userId}>
+            <SecureRoute redirectTo="/" isRedirection={!!isAuth}>
               <LoginPage />
             </SecureRoute>
           }

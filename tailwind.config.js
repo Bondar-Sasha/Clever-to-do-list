@@ -7,6 +7,7 @@ export default {
   theme: {
     colors: {
       ...colors,
+      theme: '#ed6e47',
     },
     extend: {
       spacing: {},
