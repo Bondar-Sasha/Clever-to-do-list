@@ -13,7 +13,6 @@ import SecureRoute from './secure routes/SecureRoute'
 
 const AppRoutes: FC = () => {
   const userId = true
-
   return (
     <BrowserRouter>
       <Routes>
