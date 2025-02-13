@@ -3,6 +3,7 @@ import colors from 'tailwindcss/colors'
 import plugin from 'tailwindcss/plugin'
 
 export default {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     colors: {
       ...colors,
