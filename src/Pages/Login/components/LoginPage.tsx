@@ -44,7 +44,7 @@ const LoginPage: FC = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="relative w-3/5 m-3">
+    <div className="relative w-3/5">
       <header className="flex items-center mb-48">
         <MdExpandLess
           className="mr-4 -rotate-90 text-2xl cursor-pointer"
