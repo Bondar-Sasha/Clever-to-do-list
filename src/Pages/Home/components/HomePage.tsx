@@ -1,24 +1,35 @@
 import {FC} from 'react'
-import {createUserWithEmailAndPassword, onAuthStateChanged} from 'firebase/auth'
+import {signOut} from 'firebase/auth'
+import {Link} from 'react-router-dom'
+import {TbLogout2} from 'react-icons/tb'
 
-import {auth} from '@/Shared'
+import {auth, useUserCredentials} from '@/Shared'
 
-async function func() {
-  const userCredential = await createUserWithEmailAndPassword(
-    auth,
-    'sashabond',
-    '151'
-  )
-  console.log(userCredential)
+const so = async () => {
+  try {
+    await signOut(auth)
+  } catch (error) {
+    console.error(error)
+  }
 }
-onAuthStateChanged(auth, (user) => {
-  console.log(user)
-})
-
 const HomePage: FC = () => {
+  const {user} = useUserCredentials()
   return (
-    <div className="stretching flex items-center flex-col">
-      <button onClick={func}>click</button>
+    <div className="w-3/4 stretching">
+      <header className="flex justify-between items-center p-3 ">
+        <h1 className="text-3xl font-bold">Home</h1>
+        {user ? (
+          <TbLogout2
+            className="cursor-pointer text-theme text-2xl"
+            onClick={so}
+          />
+        ) : (
+          <Link to="/auth/login" className="text-theme hover:underline">
+            log in
+          </Link>
+        )}
+      </header>
+      <main></main>
     </div>
   )
 }

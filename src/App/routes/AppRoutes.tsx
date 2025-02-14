@@ -11,15 +11,10 @@ import {
   NotFoundPage,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
-// import {auth} from '@/Shared'
+import {useUserCredentials} from '@/Shared'
 
 const AppRoutes: FC = () => {
-  // const [isAuth, setIsAuth] = useState<boolean>(false)
-
-  // onAuthStateChanged(auth, (user) => {
-  //   // setIsAuth(!!user)
-  // })
-
+  const {user} = useUserCredentials()
   return (
     <BrowserRouter>
       <Routes>
@@ -27,15 +22,23 @@ const AppRoutes: FC = () => {
         <Route
           path="/create_task"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!isAuth}>
+            <SecureRoute redirectTo="/" isRedirection={!user}>
               <CreateTaskPage />
             </SecureRoute>
           }
         />
         <Route
-          path="/edit_task"
+          path="/edit_task/:taskId"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!isAuth}>
+            <SecureRoute redirectTo="/" isRedirection={!user}>
+              <EditTaskPage />
+            </SecureRoute>
+          }
+        />
+        <Route
+          path="/tasks/:taskId"
+          element={
+            <SecureRoute redirectTo="/" isRedirection={!user}>
               <EditTaskPage />
             </SecureRoute>
           }
@@ -44,7 +47,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/registration"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!isAuth}>
+            <SecureRoute redirectTo="/" isRedirection={!!user}>
               <RegisterPage />
             </SecureRoute>
           }
@@ -52,7 +55,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/login"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!isAuth}>
+            <SecureRoute redirectTo="/" isRedirection={!!user}>
               <LoginPage />
             </SecureRoute>
           }
