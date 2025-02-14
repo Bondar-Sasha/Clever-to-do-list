@@ -10,6 +10,7 @@ import 'normalize.css'
 
 import {AppRoutes} from '../routes'
 import '../styles/index.css'
+import {useUserCredentials} from '@/Shared'
 
 const theme = createTheme({
   palette: {
@@ -21,7 +22,10 @@ const theme = createTheme({
 })
 
 const App: FC = () => {
-  return (
+  const {isFetching} = useUserCredentials()
+  return isFetching ? (
+    <div className="text-xl">Loading...</div>
+  ) : (
     <ThemeProvider theme={theme}>
       <AppRoutes />
       <ToastContainer
