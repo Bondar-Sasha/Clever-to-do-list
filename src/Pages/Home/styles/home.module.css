@@ -1,0 +1,10 @@
+.days_container {
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+
+.days_container::-webkit-scrollbar {
+  display: none;
+}

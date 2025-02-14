@@ -5,7 +5,13 @@ import {TbLogout2} from 'react-icons/tb'
 import {FirebaseError} from 'firebase/app'
 import {toast} from 'react-toastify'
 
+import styles from '../styles/home.module.css'
 import {auth, useUserCredentials} from '@/Shared'
+
+const dayStylesMap: {[key: string]: string} = {
+  Sun: 'text-theme bg-white border-2 border-theme',
+  cur: 'bg-blueGray-900 text-white border-none',
+}
 
 function generateDates(monthsCount: number) {
   const datesCache = []
@@ -59,8 +65,8 @@ const HomePage: FC = () => {
   //     date: {year: 2022, month: 1, day: 1},
   //   })
   return (
-    <div className="w-3/4 stretching">
-      <header className="flex justify-between items-center">
+    <>
+      <header className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Home</h1>
         {user ? (
           <TbLogout2
@@ -74,13 +80,29 @@ const HomePage: FC = () => {
         )}
       </header>
       <main>
-        <div>
-          {generateDates(monthState).map((item) => {
-            return <div>{item.day}</div>
+        <div className={`flex ${styles.days_container}`}>
+          {generateDates(monthState).map(({weekday, ...dayInf}, index) => {
+            return (
+              <div
+                className="flex flex-col items-center"
+                key={JSON.stringify(dayInf)}
+              >
+                <div
+                  className={`box-border flex flex-col items-center w-20 h-20 rounded-2xl mr-4 p-3 cursor-pointer font-bold border-2 ${dayStylesMap[index === 0 ? 'cur' : weekday]}`}
+                >
+                  <span className="text-xl">{weekday}</span>
+                  <span className="text-lg">{dayInf.day}</span>
+                </div>
+                <div>
+                  <div></div>
+                  <div></div>
+                </div>
+              </div>
+            )
           })}
         </div>
       </main>
-    </div>
+    </>
   )
 }
 
