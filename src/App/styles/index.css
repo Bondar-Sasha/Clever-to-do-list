@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  max-width: 762px;
+}
+
+#root > * {
+  width: 100%;
+}
+
+@media (width > 762px) {
+  #root {
+    display: flex;
+    align-items: center;
+    justify-self: center;
+  }
+}
