@@ -1,4 +1,4 @@
-import {FC, useState} from 'react'
+import {FC, useEffect, useState} from 'react'
 import {signOut} from 'firebase/auth'
 import {Link} from 'react-router-dom'
 import {TbLogout2} from 'react-icons/tb'
@@ -6,7 +6,8 @@ import {FirebaseError} from 'firebase/app'
 import {toast} from 'react-toastify'
 
 import styles from '../styles/home.module.css'
-import {auth, useUserCredentials, IDate, createTask, getTasks} from '@/Shared'
+import {auth, useUserCredentials, IDate, getTasks, formatDate} from '@/Shared'
+import {addTasks, selectorTasks, useAppDispatch, useAppSelector} from '@/App'
 
 const getDayStyles = (isPickedDay: boolean) => {
   const dayStylesMap = {
@@ -35,12 +36,10 @@ function generateDates(monthsCount: number): IDate[] {
       Math.floor((currentDate.getMonth() + monthOffset) / 12)
     const effectiveMonth = (currentDate.getMonth() + monthOffset) % 12
     const lastDayOfMonth = new Date(year, effectiveMonth + 1, 0).getDate()
-
     const startDay = monthOffset === 0 ? currentDate.getDate() : 1
 
     for (let day = startDay; day <= lastDayOfMonth; day++) {
-      const dateString: IDate =
-        `${year}-${String(effectiveMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` as IDate
+      const dateString: IDate = formatDate(new Date(year, effectiveMonth, day))
       dates.push(dateString)
     }
   }
@@ -57,19 +56,32 @@ const handleSignOut = async () => {
   }
 }
 const HomePage: FC = () => {
+  const dispatch = useAppDispatch()
+
   const [monthState] = useState<number>(1)
   const days = generateDates(monthState)
   const [pickedDay, setPickedDay] = useState<IDate>(days[0])
   const {user} = useUserCredentials()
+  const tasks = useAppSelector(selectorTasks)
 
-  if (user) {
-    createTask({
-      userId: user.uid,
-      task: {title: 'test', description: 'test'},
-      date: pickedDay,
-    })
-    getTasks({startDate: pickedDay, endDate: pickedDay, userId: user.uid})
-  }
+  useEffect(() => {
+    if (!user) {
+      return
+    }
+
+    const handleGetTasks = async () => {
+      const tasks = await getTasks({
+        currentDate: new Date(pickedDay),
+        userId: user.uid,
+      })
+      if (!tasks) {
+        return
+      }
+      dispatch(addTasks(tasks))
+    }
+
+    handleGetTasks()
+  }, [dispatch, pickedDay, user])
 
   return (
     <>
@@ -114,6 +126,13 @@ const HomePage: FC = () => {
               </div>
             )
           })}
+        </div>
+        <div className="flex flex-col">
+          {tasks[pickedDay] &&
+            Object.keys(tasks[pickedDay]).map((item) => {
+              const task = tasks[pickedDay][item]
+              return <div>{task.title}</div>
+            })}
         </div>
       </main>
     </>

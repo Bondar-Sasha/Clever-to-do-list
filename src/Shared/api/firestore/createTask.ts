@@ -1,11 +1,4 @@
-import {
-  addDoc,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  Timestamp,
-} from 'firebase/firestore'
+import {addDoc, collection, doc, setDoc, getDoc} from 'firebase/firestore'
 
 import {db} from '../../config/firebase'
 import {IDate, Task} from '../../types'
@@ -34,8 +27,6 @@ export async function createTask({
   }
 
   if (!dateDoc.exists()) {
-    const dateTimestamp = Timestamp.fromDate(new Date(date))
-    await setDoc(dateRef, {date: dateTimestamp})
     await setDoc(dateRef, {date})
   }
 
