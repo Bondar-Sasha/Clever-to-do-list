@@ -8,24 +8,19 @@ import {
 } from 'firebase/firestore'
 
 import {db} from '../../config/firebase'
-
-interface Date {
-  year: number
-  month: number
-}
+import {IDate, TaskWithIsDoneFlag} from '../../types'
 
 interface GetTasksArgs {
-  date: Date
+  startDate: IDate
+  endDate: IDate
   userId: string
 }
 
-interface Task {
-  title: string
-  description: string
-  isDone: boolean
-}
-
-export async function getTasks({userId, date}: GetTasksArgs) {
+export async function getTasks({
+  userId,
+  startDate,
+  endDate,
+}: GetTasksArgs): Record<IDate, TaskWithIsDoneFlag> | null {
   const userRef = doc(db, 'user', userId)
 
   const userDoc = await getDoc(userRef)
@@ -37,8 +32,8 @@ export async function getTasks({userId, date}: GetTasksArgs) {
     query(
       collection(db, 'task'),
       where('userRef', '==', userRef),
-      where('month', '==', date.month),
-      where('year', '==', date.year)
+      where('date', '>=', new Date(startDate)),
+      where('date', '<=', new Date(endDate))
     )
   )
 
@@ -46,9 +41,5 @@ export async function getTasks({userId, date}: GetTasksArgs) {
     return null
   }
 
-  const tasks = taskQuerySnapshot.docs.map(({id, data}) => ({
-    id,
-    ...(data() as Task),
-  }))
-  return tasks
+  console.log(taskQuerySnapshot.docs)
 }

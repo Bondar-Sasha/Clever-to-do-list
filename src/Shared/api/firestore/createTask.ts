@@ -1,20 +1,17 @@
-import {addDoc, collection, doc, setDoc, getDoc} from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  Timestamp,
+} from 'firebase/firestore'
 
 import {db} from '../../config/firebase'
-
-interface Date {
-  year: number
-  month: number
-  day: number
-}
-
-interface Task {
-  title: string
-  description: string
-}
+import {IDate, Task} from '../../types'
 
 interface CreateTaskArgs {
-  date: Date
+  date: IDate
   userId: string
   task: Task
 }
@@ -25,7 +22,7 @@ export async function createTask({
   date,
 }: CreateTaskArgs): Promise<void> {
   const userRef = doc(db, 'user', userId)
-  const dateRef = doc(db, 'date', JSON.stringify(date))
+  const dateRef = doc(db, 'date', date)
 
   const [userDoc, dateDoc] = await Promise.all([
     getDoc(userRef),
@@ -37,6 +34,8 @@ export async function createTask({
   }
 
   if (!dateDoc.exists()) {
+    const dateTimestamp = Timestamp.fromDate(new Date(date))
+    await setDoc(dateRef, {date: dateTimestamp})
     await setDoc(dateRef, {date})
   }
 
