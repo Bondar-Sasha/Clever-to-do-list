@@ -1,5 +1,6 @@
 import {FC} from 'react'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
+import {useAuthState} from 'react-firebase-hooks/auth'
 
 import {
   HomePage,
@@ -10,12 +11,10 @@ import {
   NotFoundPage,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
-import {useUserCredentials} from '@/Shared'
+import {auth} from '@/Shared'
 
 const AppRoutes: FC = () => {
-  const {user, isFetching} = useUserCredentials()
-
-  const noUserCondition = !user && !isFetching
+  const [user] = useAuthState(auth)
 
   return (
     <BrowserRouter>
@@ -24,7 +23,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/create_task/:date"
           element={
-            <SecureRoute redirectTo="/" isRedirection={noUserCondition}>
+            <SecureRoute redirectTo="/" isRedirection={!user}>
               <CreateTaskPage />
             </SecureRoute>
           }
@@ -32,7 +31,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/edit_task/:taskId"
           element={
-            <SecureRoute redirectTo="/" isRedirection={noUserCondition}>
+            <SecureRoute redirectTo="/" isRedirection={!user}>
               <EditTaskPage />
             </SecureRoute>
           }
@@ -41,7 +40,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/registration"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!user && !isFetching}>
+            <SecureRoute redirectTo="/" isRedirection={!!user}>
               <RegisterPage />
             </SecureRoute>
           }
@@ -49,7 +48,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/login"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!user && !isFetching}>
+            <SecureRoute redirectTo="/" isRedirection={!!user}>
               <LoginPage />
             </SecureRoute>
           }

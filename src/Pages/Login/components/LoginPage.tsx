@@ -1,23 +1,25 @@
 import {FC} from 'react'
 import {MdExpandLess} from 'react-icons/md'
 import {Link, useNavigate} from 'react-router-dom'
-import {signInWithEmailAndPassword} from 'firebase/auth'
-import {FirebaseError} from 'firebase/app'
+import {useSignInWithEmailAndPassword} from 'react-firebase-hooks/auth'
 import {toast} from 'react-toastify'
 
 import {auth} from '@/Shared'
 import {AuthForm, AuthFormData} from '@/Widgets'
 
-const onSubmit = async ({email, password}: AuthFormData) => {
-  try {
-    await signInWithEmailAndPassword(auth, email, password)
-  } catch (error) {
-    const firebaseError = error as FirebaseError
-    toast(firebaseError.message, {type: 'error'})
-  }
-}
 const LoginPage: FC = () => {
   const navigate = useNavigate()
+
+  const [signInWithEmailAndPassword, , loading, error] =
+    useSignInWithEmailAndPassword(auth)
+
+  if (error) {
+    toast(error.message, {type: 'error'})
+  }
+
+  const onSubmit = async ({email, password}: AuthFormData) => {
+    signInWithEmailAndPassword(email, password)
+  }
 
   return (
     <div className="relative w-3/5">
@@ -31,7 +33,11 @@ const LoginPage: FC = () => {
         <h1 className="text-3xl font-bold">Log in</h1>
       </header>
       <main>
-        <AuthForm onSubmit={onSubmit} onSubmitLabel="Log in" />
+        <AuthForm
+          onSubmit={onSubmit}
+          onSubmitLabel="Log in"
+          isFetching={loading}
+        />
         <div className="mt-4 flex justify-between w-full">
           <span>I do not have an account</span>
           <Link to="/auth/registration" className="text-theme hover:underline">

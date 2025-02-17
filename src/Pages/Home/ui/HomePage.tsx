@@ -1,18 +1,11 @@
 import {FC, useState} from 'react'
-import {signOut} from 'firebase/auth'
 import {Link, useNavigate} from 'react-router-dom'
 import {TbLogout2} from 'react-icons/tb'
-import {FirebaseError} from 'firebase/app'
 import {toast} from 'react-toastify'
+import {useAuthState, useSignOut} from 'react-firebase-hooks/auth'
 
 import styles from '../styles/home.module.css'
-import {
-  auth,
-  useUserCredentials,
-  IDate,
-  formatDate,
-  useGetTasks,
-} from '@/Shared'
+import {auth, IDate, formatDate, useTasks} from '@/Shared'
 import {Button} from '@mui/material'
 
 const getDayStyles = (isPickedDay: boolean) => {
@@ -53,24 +46,23 @@ function generateDates(monthsCount: number): IDate[] {
   return dates
 }
 
-const handleSignOut = async () => {
-  try {
-    await signOut(auth)
-  } catch (error) {
-    const firebaseError = error as FirebaseError
-    toast(firebaseError.message, {type: 'error'})
-  }
-}
-
 const HomePage: FC = () => {
   const navigate = useNavigate()
+  const [signOut] = useSignOut(auth)
+  const [user, , signOutError] = useAuthState(auth)
+
   const [monthState] = useState<number>(1)
   const days = generateDates(monthState)
   const [pickedDay, setPickedDay] = useState<IDate>(days[0])
-  const {user} = useUserCredentials()
-  const {data} = useGetTasks(pickedDay)
 
-  const tasksForDay = data?.[pickedDay]
+  const {data} = useTasks({
+    userId: user!.uid,
+    currentDate: new Date(pickedDay),
+  })
+  // console.log(isFetching)
+  // if (isFetching) {
+  //   return <div>data f</div>
+  // }
 
   if (!user) {
     return (
@@ -87,13 +79,19 @@ const HomePage: FC = () => {
       </>
     )
   }
+
+  if (signOutError) {
+    toast(signOutError.message, {type: 'error'})
+  }
+
+  const tasksForDay = data?.[pickedDay]
   return (
     <>
       <header className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Home</h1>
         <TbLogout2
           className="cursor-pointer text-theme text-2xl"
-          onClick={handleSignOut}
+          onClick={signOut}
         />
       </header>
       <main>

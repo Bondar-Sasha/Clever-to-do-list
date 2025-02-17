@@ -12,6 +12,7 @@ export interface AuthFormData {
 interface AuthFormProps {
   onSubmitLabel: string
   onSubmit: (formData: AuthFormData) => Promise<void>
+  isFetching?: boolean
 }
 
 const validationSchema = Yup.object({
@@ -31,7 +32,11 @@ const initialValues: AuthFormData = {
   password: '',
 }
 
-const AuthForm: FC<AuthFormProps> = ({onSubmit, onSubmitLabel}) => {
+const AuthForm: FC<AuthFormProps> = ({
+  onSubmit,
+  onSubmitLabel,
+  isFetching = false,
+}) => {
   return (
     <Formik
       initialValues={initialValues}
@@ -71,6 +76,7 @@ const AuthForm: FC<AuthFormProps> = ({onSubmit, onSubmitLabel}) => {
             <Button
               type="submit"
               variant="contained"
+              loading={isFetching}
               sx={{borderRadius: '20px', height: '40px'}}
             >
               {onSubmitLabel}
