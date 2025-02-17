@@ -1,13 +1,19 @@
-import {FC, useEffect, useState} from 'react'
+import {FC, useState} from 'react'
 import {signOut} from 'firebase/auth'
-import {Link} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import {TbLogout2} from 'react-icons/tb'
 import {FirebaseError} from 'firebase/app'
 import {toast} from 'react-toastify'
 
 import styles from '../styles/home.module.css'
-import {auth, useUserCredentials, IDate, getTasks, formatDate} from '@/Shared'
-import {addTasks, selectorTasks, useAppDispatch, useAppSelector} from '@/App'
+import {
+  auth,
+  useUserCredentials,
+  IDate,
+  formatDate,
+  useGetTasks,
+} from '@/Shared'
+import {Button} from '@mui/material'
 
 const getDayStyles = (isPickedDay: boolean) => {
   const dayStylesMap = {
@@ -55,48 +61,40 @@ const handleSignOut = async () => {
     toast(firebaseError.message, {type: 'error'})
   }
 }
-const HomePage: FC = () => {
-  const dispatch = useAppDispatch()
 
+const HomePage: FC = () => {
+  const navigate = useNavigate()
   const [monthState] = useState<number>(1)
   const days = generateDates(monthState)
   const [pickedDay, setPickedDay] = useState<IDate>(days[0])
   const {user} = useUserCredentials()
-  const tasks = useAppSelector(selectorTasks)
+  const {data} = useGetTasks(pickedDay)
 
-  useEffect(() => {
-    if (!user) {
-      return
-    }
+  const tasksForDay = data?.[pickedDay]
 
-    const handleGetTasks = async () => {
-      const tasks = await getTasks({
-        currentDate: new Date(pickedDay),
-        userId: user.uid,
-      })
-      if (!tasks) {
-        return
-      }
-      dispatch(addTasks(tasks))
-    }
-
-    handleGetTasks()
-  }, [dispatch, pickedDay, user])
-
+  if (!user) {
+    return (
+      <>
+        <header className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold">Home</h1>
+          <Link to="/auth/login" className="text-theme hover:underline">
+            log in
+          </Link>
+        </header>
+        <main className="flex-center h-64">
+          <span className="text-xl">Log in to see the tasks</span>
+        </main>
+      </>
+    )
+  }
   return (
     <>
       <header className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Home</h1>
-        {user ? (
-          <TbLogout2
-            className="cursor-pointer text-theme text-2xl"
-            onClick={handleSignOut}
-          />
-        ) : (
-          <Link to="/auth/login" className="text-theme hover:underline">
-            log in
-          </Link>
-        )}
+        <TbLogout2
+          className="cursor-pointer text-theme text-2xl"
+          onClick={handleSignOut}
+        />
       </header>
       <main>
         <div className={`flex ${styles.daysContainer}`}>
@@ -127,13 +125,25 @@ const HomePage: FC = () => {
             )
           })}
         </div>
-        <div className="flex flex-col">
-          {tasks[pickedDay] &&
-            Object.keys(tasks[pickedDay]).map((item) => {
-              const task = tasks[pickedDay][item]
-              return <div>{task.title}</div>
-            })}
+        <div className="flex flex-col min-h-64 items-center justify-center">
+          {tasksForDay ? (
+            Object.keys(tasksForDay).map((item) => {
+              const task = tasksForDay[item]
+              return <div key={item}>{task.title}</div>
+            })
+          ) : (
+            <span className="text-xl">There are no tasks for today</span>
+          )}
         </div>
+        <Button
+          variant="outlined"
+          sx={{width: '100%', height: '40px'}}
+          onClick={() => {
+            navigate(`/create_task/${pickedDay}`)
+          }}
+        >
+          Add task
+        </Button>
       </main>
     </>
   )

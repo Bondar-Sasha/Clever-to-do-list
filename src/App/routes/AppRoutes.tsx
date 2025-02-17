@@ -1,6 +1,5 @@
 import {FC} from 'react'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
-// import {onAuthStateChanged} from 'firebase/auth'
 
 import {
   HomePage,
@@ -14,15 +13,18 @@ import SecureRoute from './secure routes/SecureRoute'
 import {useUserCredentials} from '@/Shared'
 
 const AppRoutes: FC = () => {
-  const {user} = useUserCredentials()
+  const {user, isFetching} = useUserCredentials()
+
+  const noUserCondition = !user && !isFetching
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
-          path="/create_task"
+          path="/create_task/:date"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!user}>
+            <SecureRoute redirectTo="/" isRedirection={noUserCondition}>
               <CreateTaskPage />
             </SecureRoute>
           }
@@ -30,15 +32,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/edit_task/:taskId"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!user}>
-              <EditTaskPage />
-            </SecureRoute>
-          }
-        />
-        <Route
-          path="/tasks/:taskId"
-          element={
-            <SecureRoute redirectTo="/" isRedirection={!user}>
+            <SecureRoute redirectTo="/" isRedirection={noUserCondition}>
               <EditTaskPage />
             </SecureRoute>
           }
@@ -47,7 +41,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/registration"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!user}>
+            <SecureRoute redirectTo="/" isRedirection={!!user && !isFetching}>
               <RegisterPage />
             </SecureRoute>
           }
@@ -55,7 +49,7 @@ const AppRoutes: FC = () => {
         <Route
           path="/auth/login"
           element={
-            <SecureRoute redirectTo="/" isRedirection={!!user}>
+            <SecureRoute redirectTo="/" isRedirection={!!user && !isFetching}>
               <LoginPage />
             </SecureRoute>
           }
