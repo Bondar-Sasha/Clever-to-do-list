@@ -1,19 +1,12 @@
 import {FC, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {Field, Form, Formik, FormikHelpers} from 'formik'
-import {Alert, Button, TextField} from '@mui/material'
 import {MdExpandLess} from 'react-icons/md'
-import * as Yup from 'yup'
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {addDoc, collection} from 'firebase/firestore'
+import {FormikHelpers} from 'formik'
 
 import {auth, db, formatDate, Params} from '@/Shared'
-import {NotFoundMask} from '@/Widgets'
-
-interface AddTaskData {
-  title: string
-  description: string
-}
+import {NotFoundMask, TaskForm, TaskFormData} from '@/Widgets'
 
 const CreateTaskPage: FC = () => {
   const navigate = useNavigate()
@@ -35,19 +28,9 @@ const CreateTaskPage: FC = () => {
     return <NotFoundMask label="There is no such page" />
   }
 
-  const validationSchema = Yup.object({
-    title: Yup.string().required('title is required'),
-    description: Yup.string(),
-  })
-
-  const initialValues: AddTaskData = {
-    title: '',
-    description: '',
-  }
-
   const onSubmit = async (
-    taskData: AddTaskData,
-    {resetForm}: FormikHelpers<AddTaskData>
+    taskData: TaskFormData,
+    {resetForm}: FormikHelpers<TaskFormData>
   ) => {
     try {
       setFetching(true)
@@ -75,52 +58,11 @@ const CreateTaskPage: FC = () => {
         <h1 className="text-3xl font-bold">Add a task</h1>
       </header>
       <div className="stretching flex items-center flex-col">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
+        <TaskForm
           onSubmit={onSubmit}
-        >
-          {({errors}) => (
-            <>
-              <div className="absolute w-full top-16">
-                {errors.title && (
-                  <Alert severity="error" className="mb-2">
-                    {errors.title}
-                  </Alert>
-                )}
-              </div>
-
-              <Form className={`text-ordinary-text flex flex-col w-full`}>
-                <Field
-                  as={TextField}
-                  label="title"
-                  name="title"
-                  variant="outlined"
-                  sx={{
-                    marginBottom: '12px',
-                  }}
-                />
-                <Field
-                  as={TextField}
-                  label="description"
-                  name="description"
-                  variant="outlined"
-                  sx={{
-                    marginBottom: '12px',
-                  }}
-                />
-                <Button
-                  loading={fetching}
-                  type="submit"
-                  variant="contained"
-                  sx={{borderRadius: '20px', height: '40px'}}
-                >
-                  add the task
-                </Button>
-              </Form>
-            </>
-          )}
-        </Formik>
+          onSubmitLabel="create the task"
+          isFetching={fetching}
+        />
       </div>
     </div>
   )

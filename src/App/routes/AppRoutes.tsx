@@ -29,7 +29,7 @@ const AppRoutes: FC = () => {
           }
         />
         <Route
-          path="/edit_task/:taskId"
+          path="/edit_task/:date/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <EditTaskPage />

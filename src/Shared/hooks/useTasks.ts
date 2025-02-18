@@ -4,12 +4,12 @@ import {useCollectionOnce} from 'react-firebase-hooks/firestore'
 import {db} from '../config/firebase'
 import {IDate, TaskResponse} from '../types'
 import {formatDate} from '../utils'
+import {useAuthState} from 'react-firebase-hooks/auth'
+import {auth} from '../api'
 
-interface GetTasksArgs {
-  currentDate: Date
-  userId?: string
-}
-type UseTasksResponse = [Record<IDate, TaskResponse[]>, boolean] | [null, false]
+type UseTasksResponse =
+  | [Record<IDate, TaskResponse[]>, boolean]
+  | [null, boolean]
 
 function getMonthStartAndEnd(date: Date) {
   const year = date.getFullYear()
@@ -21,24 +21,22 @@ function getMonthStartAndEnd(date: Date) {
   return [formatDate(startOfMonth), formatDate(endOfMonth)]
 }
 
-export function useTasks({
-  userId,
-  currentDate,
-}: GetTasksArgs): UseTasksResponse {
-  const dateRestrictions = getMonthStartAndEnd(currentDate)
+export function useTasks(): UseTasksResponse {
+  const dateRestrictions = getMonthStartAndEnd(new Date())
+  const [user, userFetching] = useAuthState(auth)
 
   const [data, isFetching] = useCollectionOnce(
-    userId
+    user?.uid
       ? query(
           collection(db, 'task'),
-          where('user', '==', userId),
+          where('user', '==', user.uid),
           where('date', '>=', dateRestrictions[0]),
           where('date', '<=', dateRestrictions[1])
         )
       : null
   )
   if (!data) {
-    return [null, false]
+    return [null, userFetching]
   }
   const preparedResponse: UseTasksResponse[0] = data.docs.reduce(
     (acc, doc) => {
@@ -55,5 +53,5 @@ export function useTasks({
     {} as Record<IDate, TaskResponse[]>
   )
 
-  return [preparedResponse, isFetching] as UseTasksResponse
+  return [preparedResponse, isFetching || userFetching] as UseTasksResponse
 }

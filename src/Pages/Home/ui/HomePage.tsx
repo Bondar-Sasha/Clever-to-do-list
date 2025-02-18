@@ -60,11 +60,9 @@ const HomePage: FC = () => {
   const [pickedDay, setPickedDay] = useState<IDate>(thisDay)
   const pickedDayRef = useRef<HTMLDivElement | null>(null)
 
-  const [data] = useTasks({
-    userId: user?.uid,
-    currentDate: new Date(pickedDay),
-  })
+  const [data] = useTasks()
   console.log(data)
+
   useEffect(() => {
     if (!pickedDayRef.current) {
       return
@@ -95,7 +93,6 @@ const HomePage: FC = () => {
     toast(signOutError.message, {type: 'error'})
   }
   console.log(data)
-  // const tasksForDay = data?.[pickedDay]
   return (
     <>
       <header className="flex justify-between items-center mb-4">
@@ -138,11 +135,12 @@ const HomePage: FC = () => {
         </div>
         <div className="flex flex-col min-h-64 items-center  mt-5 mb-5">
           {data && data[pickedDay] ? (
-            data[pickedDay].map(({title, id}) => {
+            data[pickedDay].map(({title, id, isDone, date}) => {
               return (
                 <div className="flex items-center justify-between w-full min-h-16 mb-3">
                   <div>
                     <Checkbox
+                      checked={isDone}
                       size="large"
                       sx={{
                         '&.Mui-checked': {
@@ -155,7 +153,7 @@ const HomePage: FC = () => {
                   <FaPenAlt
                     className="text-theme cursor-pointer text-xl"
                     onClick={() => {
-                      navigate(`/edit_task/${id}`)
+                      navigate(`/edit_task/${date}/${id}`)
                     }}
                   />
                 </div>
