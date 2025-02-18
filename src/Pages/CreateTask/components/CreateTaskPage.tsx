@@ -1,12 +1,13 @@
-import {FC} from 'react'
+import {FC, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
-import {Field, Form, Formik} from 'formik'
+import {Field, Form, Formik, FormikHelpers} from 'formik'
 import {Alert, Button, TextField} from '@mui/material'
 import {MdExpandLess} from 'react-icons/md'
 import * as Yup from 'yup'
 import {useAuthState} from 'react-firebase-hooks/auth'
+import {addDoc, collection} from 'firebase/firestore'
 
-import {auth, createTask, formatDate, Params} from '@/Shared'
+import {auth, db, formatDate, Params} from '@/Shared'
 import {NotFoundMask} from '@/Widgets'
 
 interface AddTaskData {
@@ -16,6 +17,7 @@ interface AddTaskData {
 
 const CreateTaskPage: FC = () => {
   const navigate = useNavigate()
+  const [fetching, setFetching] = useState<boolean>(false)
   const params = useParams<Params>()
   const [user] = useAuthState(auth)
 
@@ -29,11 +31,9 @@ const CreateTaskPage: FC = () => {
 
   const dateForChecking = new Date(params.date)
 
-  if (!(dateForChecking instanceof Date && !isNaN(dateForChecking.getTime()))) {
+  if (isNaN(dateForChecking.getTime())) {
     return <NotFoundMask label="There is no such page" />
   }
-
-  const formattedDate = formatDate(dateForChecking)
 
   const validationSchema = Yup.object({
     title: Yup.string().required('title is required'),
@@ -45,12 +45,23 @@ const CreateTaskPage: FC = () => {
     description: '',
   }
 
-  const onSubmit = (taskData: AddTaskData) => {
-    createTask({
-      date: formattedDate,
-      userId: user.uid,
-      task: taskData,
-    })
+  const onSubmit = async (
+    taskData: AddTaskData,
+    {resetForm}: FormikHelpers<AddTaskData>
+  ) => {
+    try {
+      setFetching(true)
+      await addDoc(collection(db, 'task'), {
+        ...taskData,
+        isDone: false,
+        user: user.uid,
+        date: formatDate(dateForChecking),
+      })
+      resetForm()
+      setFetching(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
   return (
     <div className="relative">
@@ -99,8 +110,8 @@ const CreateTaskPage: FC = () => {
                   }}
                 />
                 <Button
+                  loading={fetching}
                   type="submit"
-                  loading
                   variant="contained"
                   sx={{borderRadius: '20px', height: '40px'}}
                 >

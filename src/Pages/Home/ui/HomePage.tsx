@@ -1,12 +1,13 @@
-import {FC, useState} from 'react'
+import {FC, useEffect, useRef, useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import {TbLogout2} from 'react-icons/tb'
 import {toast} from 'react-toastify'
 import {useAuthState, useSignOut} from 'react-firebase-hooks/auth'
+import {FaPenAlt} from 'react-icons/fa'
 
 import styles from '../styles/home.module.css'
-import {auth, IDate, formatDate, useTasks} from '@/Shared'
-import {Button} from '@mui/material'
+import {auth, formatDate, IDate, useTasks} from '@/Shared'
+import {Button, Checkbox} from '@mui/material'
 
 const getDayStyles = (isPickedDay: boolean) => {
   const dayStylesMap = {
@@ -25,44 +26,54 @@ const getDayStyles = (isPickedDay: boolean) => {
   }
 }
 
-function generateDates(monthsCount: number): IDate[] {
-  const currentDate = new Date()
-  const dates: IDate[] = []
+function generateDates(currentDate: Date, month: number): IDate[] {
+  const dates = []
+  currentDate.setDate(1)
 
-  for (let monthOffset = 0; monthOffset < monthsCount; monthOffset++) {
-    const year =
-      currentDate.getFullYear() +
-      Math.floor((currentDate.getMonth() + monthOffset) / 12)
-    const effectiveMonth = (currentDate.getMonth() + monthOffset) % 12
-    const lastDayOfMonth = new Date(year, effectiveMonth + 1, 0).getDate()
-    const startDay = monthOffset === 0 ? currentDate.getDate() : 1
+  for (let i = 0; i < month; i++) {
+    const newMonthDate = new Date(currentDate)
+    newMonthDate.setMonth(currentDate.getMonth() + i)
+    const daysInMonth = new Date(
+      newMonthDate.getFullYear(),
+      newMonthDate.getMonth() + 1,
+      0
+    ).getDate()
 
-    for (let day = startDay; day <= lastDayOfMonth; day++) {
-      const dateString: IDate = formatDate(new Date(year, effectiveMonth, day))
-      dates.push(dateString)
+    for (let day = 1; day <= daysInMonth; day++) {
+      const newDate = new Date(newMonthDate)
+      newDate.setDate(day)
+      const dateWithoutTime = formatDate(newDate)
+      dates.push(dateWithoutTime)
     }
   }
 
   return dates
 }
+const thisDay = formatDate(new Date())
 
 const HomePage: FC = () => {
   const navigate = useNavigate()
   const [signOut] = useSignOut(auth)
   const [user, , signOutError] = useAuthState(auth)
 
-  const [monthState] = useState<number>(1)
-  const days = generateDates(monthState)
-  const [pickedDay, setPickedDay] = useState<IDate>(days[0])
+  const days = generateDates(new Date(thisDay), 1)
+  const [pickedDay, setPickedDay] = useState<IDate>(thisDay)
+  const pickedDayRef = useRef<HTMLDivElement | null>(null)
 
-  const {data} = useTasks({
-    userId: user!.uid,
+  const [data] = useTasks({
+    userId: user?.uid,
     currentDate: new Date(pickedDay),
   })
-  // console.log(isFetching)
-  // if (isFetching) {
-  //   return <div>data f</div>
-  // }
+  console.log(data)
+  useEffect(() => {
+    if (!pickedDayRef.current) {
+      return
+    }
+    pickedDayRef.current.scrollIntoView({
+      behavior: 'instant',
+      inline: 'center',
+    })
+  }, [])
 
   if (!user) {
     return (
@@ -83,8 +94,8 @@ const HomePage: FC = () => {
   if (signOutError) {
     toast(signOutError.message, {type: 'error'})
   }
-
-  const tasksForDay = data?.[pickedDay]
+  console.log(data)
+  // const tasksForDay = data?.[pickedDay]
   return (
     <>
       <header className="flex justify-between items-center mb-4">
@@ -97,23 +108,25 @@ const HomePage: FC = () => {
       <main>
         <div className={`flex ${styles.daysContainer}`}>
           {days.map((dateItem) => {
-            const preparedDate = new Date(dateItem)
-
-            const dayNumber = preparedDate.getDate()
-            const dayName = preparedDate.toLocaleString('en-US', {
+            const dateFromMs = new Date(dateItem)
+            const dayName = dateFromMs.toLocaleString('en-US', {
               weekday: 'short',
             })
 
             return (
-              <div className="flex flex-col items-center" key={dateItem}>
+              <div
+                className="flex flex-col items-center"
+                ref={dateItem === pickedDay ? pickedDayRef : undefined}
+                key={dateItem}
+              >
                 <div
                   onClick={() => {
                     setPickedDay(dateItem)
                   }}
-                  className={`${styles.dayDefault} ${getDayStyles(dateItem === pickedDay)(preparedDate.getDay() === 0)}`}
+                  className={`${styles.dayDefault} ${getDayStyles(dateItem === pickedDay)(dateFromMs.getDay() === 0)}`}
                 >
                   <span className="text-xl">{dayName}</span>
-                  <span className="text-lg">{dayNumber}</span>
+                  <span className="text-lg">{dateFromMs.getDate()}</span>
                 </div>
                 <div>
                   <div></div>
@@ -123,14 +136,33 @@ const HomePage: FC = () => {
             )
           })}
         </div>
-        <div className="flex flex-col min-h-64 items-center justify-center">
-          {tasksForDay ? (
-            Object.keys(tasksForDay).map((item) => {
-              const task = tasksForDay[item]
-              return <div key={item}>{task.title}</div>
+        <div className="flex flex-col min-h-64 items-center  mt-5 mb-5">
+          {data && data[pickedDay] ? (
+            data[pickedDay].map(({title, id}) => {
+              return (
+                <div className="flex items-center justify-between w-full min-h-16 mb-3">
+                  <div>
+                    <Checkbox
+                      size="large"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#ed6e47',
+                        },
+                      }}
+                    />
+                  </div>
+                  <div className="text-xl mr-3 ml-3">{title}</div>
+                  <FaPenAlt
+                    className="text-theme cursor-pointer text-xl"
+                    onClick={() => {
+                      navigate(`/edit_task/${id}`)
+                    }}
+                  />
+                </div>
+              )
             })
           ) : (
-            <span className="text-xl">There are no tasks for today</span>
+            <>no tas</>
           )}
         </div>
         <Button
