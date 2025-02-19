@@ -4,7 +4,7 @@
 
 - [Task](#task)
 - [How to run the app](#how-to-run-the-app)
-- [App's routes](#app's-routes)
+- [Apps routes](#apps-routes)
 - [Database snapshot](#database-snapshot)
 - [Application stack](#application-stack)
 
@@ -35,7 +35,7 @@ https://clever-to-do.netlify.app/
    npm run dev
 
 
-## App's routes
+## Apps routes
 
 - `/`: Home page.
 - `/tasks/:date/:taskId"`: Particular task page.
@@ -47,23 +47,22 @@ https://clever-to-do.netlify.app/
 ## Database snapshot
 
 Collection name: task
-task's fields:
 
-- `title`: string
-- `description`: string
-- `isDone`: boolean
-- `date`: timestamp
-- `user`: string
-- `(id)`: environment provides by itself
+- `title` string
+- `description` string
+- `isDone` boolean
+- `date` timestamp
+- `user` string
+- `(id)` environment provides by itself
 
 
 ## Application stack
 
-- `react`: library
-- `mui`: for ui
-- `firebase`: backend platform
-- `formik && yup`: for forms handling
-- `react-router-dom`: app routing
-- `react-toastify`: user notification
-- `react-icons`: for getting prepared icons
-- `tailwind`: css handling
+- `react` library
+- `mui` for ui
+- `firebase` backend platform
+- `formik && yup` for forms handling
+- `react-router-dom` app routing
+- `react-toastify` user notification
+- `react-icons` for getting prepared icons
+- `tailwind` css handling
