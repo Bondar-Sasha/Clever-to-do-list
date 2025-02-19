@@ -14,11 +14,6 @@ Source: https://docs.google.com/document/d/1ARKFyS4bzCqgR-s0eeWwyiTtFtoq1-gaXvzh
 
 ## How to Run the App
 
-### Deploy
-
-To access the app via GitHub Pages, simply visit the following link:  
-https://clever-to-do.netlify.app/
-
 ### On your computer
     
 1) Clone the repository:
