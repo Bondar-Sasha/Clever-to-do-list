@@ -9,6 +9,7 @@ import {
   CreateTaskPage,
   EditTaskPage,
   NotFoundPage,
+  TaskPage,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
 import {auth} from '@/Shared'
@@ -33,6 +34,14 @@ const AppRoutes: FC = () => {
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <EditTaskPage />
+            </SecureRoute>
+          }
+        />
+        <Route
+          path="/tasks/:date/:taskId"
+          element={
+            <SecureRoute redirectTo="/" isRedirection={!user}>
+              <TaskPage />
             </SecureRoute>
           }
         />

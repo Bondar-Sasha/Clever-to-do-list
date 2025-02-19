@@ -1,7 +1,6 @@
 import {FC} from 'react'
 import 'react-toastify/dist/ReactToastify.css'
 import {ToastContainer} from 'react-toastify'
-import {CgSpinner} from 'react-icons/cg'
 import {createTheme, ThemeProvider} from '@mui/material'
 import {useAuthState} from 'react-firebase-hooks/auth'
 import '@fontsource/roboto/300.css'
@@ -13,6 +12,7 @@ import 'normalize.css'
 import {AppRoutes} from '../routes'
 import '../styles/index.css'
 import {auth} from '@/Shared'
+import {DownloadMask} from '@/Widgets'
 
 const theme = createTheme({
   palette: {
@@ -27,9 +27,7 @@ const App: FC = () => {
   const [, fetching] = useAuthState(auth)
 
   return fetching ? (
-    <div className="stretching flex-center bg-gray-100">
-      <CgSpinner className="animate-spin text-theme text-3xl" />
-    </div>
+    <DownloadMask />
   ) : (
     <ThemeProvider theme={theme}>
       <AppRoutes />

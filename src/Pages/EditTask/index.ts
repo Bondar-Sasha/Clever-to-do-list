@@ -1,3 +1,3 @@
-import EditTaskPage from './components/EditTaskPage'
+import EditTaskPage from './ui/EditTaskPage'
 
 export {EditTaskPage}

@@ -1,3 +1,3 @@
-import CreateTaskPage from './components/CreateTaskPage'
+import CreateTaskPage from './ui/CreateTaskPage'
 
 export {CreateTaskPage}

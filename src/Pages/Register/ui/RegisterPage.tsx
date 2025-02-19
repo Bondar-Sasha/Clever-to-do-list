@@ -1,25 +1,26 @@
-import {FC} from 'react'
+import {FC, useEffect} from 'react'
 import {MdExpandLess} from 'react-icons/md'
 import {Link, useNavigate} from 'react-router-dom'
-import {useSignInWithEmailAndPassword} from 'react-firebase-hooks/auth'
+import {useCreateUserWithEmailAndPassword} from 'react-firebase-hooks/auth'
 import {toast} from 'react-toastify'
 
 import {auth} from '@/Shared'
 import {AuthForm, AuthFormData} from '@/Widgets'
 
-const LoginPage: FC = () => {
+const RegisterPage: FC = () => {
   const navigate = useNavigate()
 
-  const [signInWithEmailAndPassword, , loading, error] =
-    useSignInWithEmailAndPassword(auth)
-
-  if (error) {
-    toast(error.message, {type: 'error'})
-  }
+  const [signUp, , loading, error] = useCreateUserWithEmailAndPassword(auth)
 
   const onSubmit = async ({email, password}: AuthFormData) => {
-    signInWithEmailAndPassword(email, password)
+    signUp(email, password)
   }
+
+  useEffect(() => {
+    if (error) {
+      toast(error.message, {type: 'error'})
+    }
+  }, [error])
 
   return (
     <div className="relative w-3/5">
@@ -30,18 +31,18 @@ const LoginPage: FC = () => {
             navigate('/')
           }}
         />
-        <h1 className="text-3xl font-bold">Log in</h1>
+        <h1 className="text-3xl font-bold">Sign up</h1>
       </header>
       <main>
         <AuthForm
           onSubmit={onSubmit}
-          onSubmitLabel="Log in"
+          onSubmitLabel="Sign up"
           isFetching={loading}
         />
         <div className="mt-4 flex justify-between w-full">
-          <span>I do not have an account</span>
-          <Link to="/auth/registration" className="text-theme hover:underline">
-            sign up
+          <span>I already have an account</span>
+          <Link to="/auth/login" className="text-theme hover:underline">
+            log in
           </Link>
         </div>
       </main>
@@ -49,4 +50,4 @@ const LoginPage: FC = () => {
   )
 }
 
-export default LoginPage
+export default RegisterPage

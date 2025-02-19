@@ -1,3 +1,3 @@
-import RegisterPage from './components/RegisterPage'
+import RegisterPage from './ui/RegisterPage'
 
 export {RegisterPage}

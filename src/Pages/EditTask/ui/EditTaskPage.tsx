@@ -1,11 +1,10 @@
-import {FC, useEffect, useState} from 'react'
+import {FC, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {MdExpandLess} from 'react-icons/md'
 import {doc, updateDoc} from 'firebase/firestore'
-import {toast} from 'react-toastify'
 
 import {db, formatDate, Params, useTasks} from '@/Shared'
-import {NotFoundMask, TaskForm, TaskFormData} from '@/Widgets'
+import {DownloadMask, NotFoundMask, TaskForm, TaskFormData} from '@/Widgets'
 
 const EditTaskPage: FC = () => {
   const navigate = useNavigate()
@@ -13,17 +12,6 @@ const EditTaskPage: FC = () => {
   const params = useParams<Params>()
 
   const [data, tasksFetching] = useTasks()
-
-  useEffect(() => {
-    if (!data && !tasksFetching) {
-      toast('error', {type: 'error'})
-    }
-  }, [data, tasksFetching])
-
-  console.log(data, tasksFetching)
-  if (tasksFetching) {
-    return <div>loading</div>
-  }
 
   if (!params?.taskId || !params?.date) {
     return <NotFoundMask label="There is no such page" />
@@ -34,10 +22,10 @@ const EditTaskPage: FC = () => {
   if (isNaN(dateForChecking.getTime())) {
     return <NotFoundMask label="There is no such page" />
   }
-  if (!data) {
-    return null
-  }
 
+  if (tasksFetching) {
+    return <DownloadMask />
+  }
   const onSubmit = async (taskData: TaskFormData) => {
     try {
       setFetching(true)
@@ -47,6 +35,7 @@ const EditTaskPage: FC = () => {
       console.error(error)
     }
   }
+
   return (
     <div className="relative">
       <header className="flex items-center mb-48">
@@ -59,14 +48,18 @@ const EditTaskPage: FC = () => {
         <h1 className="text-3xl font-bold">Edit the task</h1>
       </header>
       <div className="stretching flex items-center flex-col">
-        <TaskForm
-          onSubmit={onSubmit}
-          onSubmitLabel="commit changes"
-          isFetching={fetching}
-          values={data[formatDate(dateForChecking)].find(
-            (item) => item.id === params.taskId
-          )}
-        />
+        {data ? (
+          <TaskForm
+            onSubmit={onSubmit}
+            onSubmitLabel="commit changes"
+            isFetching={fetching}
+            values={data[formatDate(dateForChecking)]?.find(
+              (item) => item.id === params.taskId
+            )}
+          />
+        ) : (
+          <NotFoundMask label="There is no such page" />
+        )}
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import {collection, query, where} from 'firebase/firestore'
-import {useCollectionOnce} from 'react-firebase-hooks/firestore'
+import {useCollection} from 'react-firebase-hooks/firestore'
 
 import {db} from '../config/firebase'
 import {IDate, TaskResponse} from '../types'
@@ -25,7 +25,7 @@ export function useTasks(): UseTasksResponse {
   const dateRestrictions = getMonthStartAndEnd(new Date())
   const [user, userFetching] = useAuthState(auth)
 
-  const [data, isFetching] = useCollectionOnce(
+  const [data, isFetching] = useCollection(
     user?.uid
       ? query(
           collection(db, 'task'),
@@ -36,7 +36,7 @@ export function useTasks(): UseTasksResponse {
       : null
   )
   if (!data) {
-    return [null, userFetching]
+    return [null, isFetching || userFetching]
   }
   const preparedResponse: UseTasksResponse[0] = data.docs.reduce(
     (acc, doc) => {
