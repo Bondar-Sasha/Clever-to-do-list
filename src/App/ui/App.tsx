@@ -2,6 +2,7 @@ import {FC} from 'react'
 import 'react-toastify/dist/ReactToastify.css'
 import {ToastContainer} from 'react-toastify'
 import {createTheme, ThemeProvider} from '@mui/material'
+import {useAuthState} from 'react-firebase-hooks/auth'
 import '@fontsource/roboto/300.css'
 import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
@@ -10,7 +11,8 @@ import 'normalize.css'
 
 import {AppRoutes} from '../routes'
 import '../styles/index.css'
-import {useUserCredentials} from '@/Shared'
+import {auth} from '@/Shared'
+import {DownloadMask} from '@/Widgets'
 
 const theme = createTheme({
   palette: {
@@ -22,9 +24,10 @@ const theme = createTheme({
 })
 
 const App: FC = () => {
-  const {isFetching} = useUserCredentials()
-  return isFetching ? (
-    <div className="text-xl">Loading...</div>
+  const [, fetching] = useAuthState(auth)
+
+  return fetching ? (
+    <DownloadMask />
   ) : (
     <ThemeProvider theme={theme}>
       <AppRoutes />

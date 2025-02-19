@@ -1,3 +1,3 @@
-import LoginPage from './components/LoginPage'
+import LoginPage from './ui/LoginPage'
 
-export { LoginPage }
+export {LoginPage}

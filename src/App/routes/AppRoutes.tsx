@@ -1,6 +1,6 @@
 import {FC} from 'react'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
-// import {onAuthStateChanged} from 'firebase/auth'
+import {useAuthState} from 'react-firebase-hooks/auth'
 
 import {
   HomePage,
@@ -9,18 +9,20 @@ import {
   CreateTaskPage,
   EditTaskPage,
   NotFoundPage,
+  TaskPage,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
-import {useUserCredentials} from '@/Shared'
+import {auth} from '@/Shared'
 
 const AppRoutes: FC = () => {
-  const {user} = useUserCredentials()
+  const [user] = useAuthState(auth)
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route
-          path="/create_task"
+          path="/create_task/:date"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <CreateTaskPage />
@@ -28,7 +30,7 @@ const AppRoutes: FC = () => {
           }
         />
         <Route
-          path="/edit_task/:taskId"
+          path="/edit_task/:date/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <EditTaskPage />
@@ -36,10 +38,10 @@ const AppRoutes: FC = () => {
           }
         />
         <Route
-          path="/tasks/:taskId"
+          path="/tasks/:date/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
-              <EditTaskPage />
+              <TaskPage />
             </SecureRoute>
           }
         />

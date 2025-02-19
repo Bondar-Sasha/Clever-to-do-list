@@ -1,3 +1,3 @@
-import HomePage from './components/HomePage'
+import HomePage from './ui/HomePage'
 
-export { HomePage }
+export {HomePage}
