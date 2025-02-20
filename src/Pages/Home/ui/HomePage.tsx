@@ -1,14 +1,16 @@
 import {FC, useEffect, useRef, useState} from 'react'
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 import {TbLogout2} from 'react-icons/tb'
 import {useAuthState, useSignOut} from 'react-firebase-hooks/auth'
 import {FaPenAlt} from 'react-icons/fa'
+import {doc, updateDoc} from 'firebase/firestore'
+import {Button, Checkbox} from '@mui/material'
 
 import styles from '../styles/home.module.css'
-import {auth, db, formatDate, IDate, useTasks} from '@/Shared'
-import {Button, Checkbox} from '@mui/material'
+import {auth, db, formatDate, generateDates, IDate, useTasks} from '@/Shared'
 import {DownloadMask, NotFoundMask} from '@/Widgets'
-import {doc, updateDoc} from 'firebase/firestore'
+
+const thisDay = formatDate(new Date())
 
 const getDayStyles = (isPickedDay: boolean) => {
   const dayStylesMap = {
@@ -27,47 +29,31 @@ const getDayStyles = (isPickedDay: boolean) => {
   }
 }
 
-const generateDates = (currentDate: Date, month: number): IDate[] => {
-  const dates: IDate[] = []
-  currentDate.setDate(1)
-
-  for (let i = 0; i < month; i++) {
-    const newMonthDate = new Date(currentDate)
-    newMonthDate.setMonth(currentDate.getMonth() + i)
-    const daysInMonth = new Date(
-      newMonthDate.getFullYear(),
-      newMonthDate.getMonth() + 1,
-      0
-    ).getDate()
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const newDate = new Date(newMonthDate)
-      newDate.setDate(day)
-      const dateWithoutTime = formatDate(newDate)
-      dates.push(dateWithoutTime)
-    }
-  }
-
-  return dates
-}
-
-const thisDay = formatDate(new Date())
-
 const HomePage: FC = () => {
+  const {state} = useLocation()
+
   const navigate = useNavigate()
   const [signOut] = useSignOut(auth)
   const [user] = useAuthState(auth)
 
-  const days = generateDates(new Date(thisDay), 1)
+  const days = generateDates(thisDay, 1)
   const [pickedDay, setPickedDay] = useState<IDate>(thisDay)
   const pickedDayRef = useRef<HTMLDivElement | null>(null)
 
   const [data, dataFetching] = useTasks()
 
   useEffect(() => {
+    if (!state) {
+      return
+    }
+    setPickedDay(state)
+  }, [state])
+
+  useEffect(() => {
     if (!pickedDayRef.current) {
       return
     }
+
     pickedDayRef.current.scrollIntoView({
       behavior: 'instant',
       inline: 'center',
@@ -124,8 +110,8 @@ const HomePage: FC = () => {
 
             return (
               <div
+                ref={dateItem === pickedDay ? pickedDayRef : null}
                 className="flex flex-col items-center mr-4"
-                ref={dateItem === pickedDay ? pickedDayRef : undefined}
                 key={dateItem}
               >
                 <div
@@ -172,13 +158,13 @@ const HomePage: FC = () => {
                 />
                 <div
                   className="text-xl mx-3 hover:underline"
-                  onClick={() => navigate(`/tasks/${date}/${id}`)}
+                  onClick={() => navigate(`/tasks/${id}`)}
                 >
                   {title}
                 </div>
                 <FaPenAlt
                   className="text-theme cursor-pointer text-xl"
-                  onClick={() => navigate(`/edit_task/${date}/${id}`)}
+                  onClick={() => navigate(`/task_management/${date}/${id}`)}
                 />
               </div>
             ))
@@ -190,7 +176,7 @@ const HomePage: FC = () => {
           variant="outlined"
           sx={{width: '100%', height: '40px'}}
           onClick={() => {
-            navigate(`/create_task/${pickedDay}`)
+            navigate(`/task_management/${pickedDay}/`)
           }}
         >
           Add task

@@ -3,57 +3,65 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {MdExpandLess} from 'react-icons/md'
 import {FaPenAlt} from 'react-icons/fa'
 
-import {formatDate, Params, useTasks} from '@/Shared'
+import {formatDate, Params, useCertainTask} from '@/Shared'
 import {DownloadMask, NotFoundMask} from '@/Widgets'
 
 const TaskPage: FC = () => {
   const navigate = useNavigate()
   const params = useParams<Params>()
 
-  const [data, tasksFetching] = useTasks()
+  const [task, taskFetching] = useCertainTask({taskId: params?.taskId})
 
-  if (!params?.taskId || !params?.date) {
-    return <NotFoundMask label="There is no such page" />
+  const notFoundUI = (
+    <div>
+      <header className="flex items-center justify-between mb-48">
+        <MdExpandLess
+          className="mr-4 -rotate-90 text-2xl cursor-pointer"
+          onClick={() => {
+            navigate('/', {
+              state: null,
+              replace: true,
+            })
+          }}
+        />
+        <h1 className="text-3xl font-bold grow">Task</h1>
+      </header>
+      <NotFoundMask label="There is no such task" />
+    </div>
+  )
+
+  if (!params?.taskId) {
+    return notFoundUI
   }
 
-  const dateForChecking = new Date(params.date)
-
-  if (isNaN(dateForChecking.getTime())) {
-    return <NotFoundMask label="There is no such page" />
-  }
-
-  if (tasksFetching) {
+  if (taskFetching) {
     return <DownloadMask />
   }
-  const task = data?.[formatDate(dateForChecking)]?.find(
-    (item) => item.id === params.taskId
-  )
+  if (!task) {
+    return notFoundUI
+  }
+
   return (
     <div className="relative">
       <header className="flex items-center justify-between mb-48">
         <MdExpandLess
           className="mr-4 -rotate-90 text-2xl cursor-pointer"
           onClick={() => {
-            navigate('/')
+            navigate('/', {
+              state: formatDate(new Date(task.date)),
+              replace: true,
+            })
           }}
         />
         <h1 className="text-3xl font-bold grow">Task</h1>
-        {task && (
-          <FaPenAlt
-            className="text-theme cursor-pointer text-xl"
-            onClick={() => navigate(`/edit_task/${task.date}/${task.id}`)}
-          />
-        )}
+        <FaPenAlt
+          className="text-theme cursor-pointer text-xl"
+          onClick={() => navigate(`/task_management/${task.id}`)}
+        />
       </header>
       <div className="stretching flex items-center flex-col">
-        {task ? (
-          <>
-            <h1 className="mb-3 text-3xl">{task.title}</h1>
-            <span>{task.description}</span>
-          </>
-        ) : (
-          <NotFoundMask label="There is no such page" />
-        )}
+        <h1 className="mb-3 text-3xl">{task.title}</h1>
+        <span>{task.description}</span>
       </div>
     </div>
   )

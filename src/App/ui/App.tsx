@@ -1,4 +1,4 @@
-import {FC} from 'react'
+import {FC, useEffect} from 'react'
 import 'react-toastify/dist/ReactToastify.css'
 import {ToastContainer} from 'react-toastify'
 import {createTheme, ThemeProvider} from '@mui/material'
@@ -25,6 +25,10 @@ const theme = createTheme({
 
 const App: FC = () => {
   const [, fetching] = useAuthState(auth)
+
+  useEffect(() => {
+    window.history.replaceState({}, '')
+  }, [])
 
   return fetching ? (
     <DownloadMask />

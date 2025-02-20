@@ -12,20 +12,9 @@ export interface AuthFormData {
 interface AuthFormProps {
   onSubmitLabel: string
   onSubmit: (formData: AuthFormData) => Promise<void>
+  isLogin?: boolean
   isFetching?: boolean
 }
-
-const validationSchema = Yup.object({
-  email: Yup.string()
-    .required('email is required')
-    .matches(
-      /^[A-Za-z0-9@._]+$/,
-      'email must contain only Latin letters, numbers, and valid email characters'
-    ),
-  password: Yup.string()
-    .required('Password is required')
-    .min(6, 'Password must be at least 6 characters'),
-})
 
 const initialValues: AuthFormData = {
   email: '',
@@ -35,8 +24,21 @@ const initialValues: AuthFormData = {
 const AuthForm: FC<AuthFormProps> = ({
   onSubmit,
   onSubmitLabel,
+  isLogin = false,
   isFetching = false,
 }) => {
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .required('email is required')
+      .matches(
+        !isLogin ? /^[A-Za-z0-9@._]+$/ : /^.*$/,
+        'email must contain only Latin letters, numbers, and valid email characters'
+      ),
+    password: Yup.string()
+      .required('password is required')
+      .min(!isLogin ? 6 : 0, 'password must be at least 6 characters'),
+  })
+
   return (
     <Formik
       initialValues={initialValues}

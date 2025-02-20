@@ -6,10 +6,9 @@ import {
   HomePage,
   LoginPage,
   RegisterPage,
-  CreateTaskPage,
-  EditTaskPage,
   NotFoundPage,
   TaskPage,
+  TaskManagement,
 } from '@/Pages'
 import SecureRoute from './secure routes/SecureRoute'
 import {auth} from '@/Shared'
@@ -21,24 +20,25 @@ const AppRoutes: FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+
         <Route
-          path="/create_task/:date"
+          path="/task_management/:date"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
-              <CreateTaskPage />
+              <TaskManagement />
             </SecureRoute>
           }
         />
         <Route
-          path="/edit_task/:date/:taskId"
+          path="/task_management/:date/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
-              <EditTaskPage />
+              <TaskManagement />
             </SecureRoute>
           }
         />
         <Route
-          path="/tasks/:date/:taskId"
+          path="/tasks/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <TaskPage />

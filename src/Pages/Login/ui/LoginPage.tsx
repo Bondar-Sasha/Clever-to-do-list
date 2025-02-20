@@ -36,6 +36,7 @@ const LoginPage: FC = () => {
       </header>
       <main>
         <AuthForm
+          isLogin
           onSubmit={onSubmit}
           onSubmitLabel="Log in"
           isFetching={loading}
