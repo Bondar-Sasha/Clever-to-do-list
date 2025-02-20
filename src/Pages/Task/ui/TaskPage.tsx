@@ -12,15 +12,33 @@ const TaskPage: FC = () => {
 
   const [task, taskFetching] = useCertainTask({taskId: params?.taskId})
 
+  const notFoundUI = (
+    <div>
+      <header className="flex items-center justify-between mb-48">
+        <MdExpandLess
+          className="mr-4 -rotate-90 text-2xl cursor-pointer"
+          onClick={() => {
+            navigate('/', {
+              state: null,
+              replace: true,
+            })
+          }}
+        />
+        <h1 className="text-3xl font-bold grow">Task</h1>
+      </header>
+      <NotFoundMask label="There is no such task" />
+    </div>
+  )
+
   if (!params?.taskId) {
-    return <NotFoundMask label="Task" />
+    return notFoundUI
   }
 
   if (taskFetching) {
     return <DownloadMask />
   }
   if (!task) {
-    return <NotFoundMask label="Task" />
+    return notFoundUI
   }
 
   return (
@@ -38,16 +56,12 @@ const TaskPage: FC = () => {
         <h1 className="text-3xl font-bold grow">Task</h1>
         <FaPenAlt
           className="text-theme cursor-pointer text-xl"
-          onClick={() => navigate(`/task_management/${task.date}/${task.id}`)}
+          onClick={() => navigate(`/task_management/${task.id}`)}
         />
       </header>
-      <div className="stretching flex items-center flex-col w-full">
-        <h1 className="mb-3 text-2xl w-full break-words text-center">
-          {task.title}
-        </h1>
-        <span className="w-full break-words text-center">
-          {task.description}
-        </span>
+      <div className="stretching flex items-center flex-col">
+        <h1 className="mb-3 text-3xl">{task.title}</h1>
+        <span>{task.description}</span>
       </div>
     </>
   )
