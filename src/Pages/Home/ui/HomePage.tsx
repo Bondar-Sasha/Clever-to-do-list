@@ -164,7 +164,7 @@ const HomePage: FC = () => {
                 </div>
                 <FaPenAlt
                   className="text-theme cursor-pointer text-xl"
-                  onClick={() => navigate(`/task_management/${date}/${id}`)}
+                  onClick={() => navigate(`/edit_task/${date}/${id}`)}
                 />
               </div>
             ))
@@ -178,7 +178,7 @@ const HomePage: FC = () => {
           variant="outlined"
           sx={{width: '100%', height: '40px'}}
           onClick={() => {
-            navigate(`/task_management/${pickedDay}/`)
+            navigate(`/create_task/${pickedDay}/`)
           }}
         >
           Add task

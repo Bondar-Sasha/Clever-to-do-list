@@ -2,7 +2,7 @@ import {FC, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {MdExpandLess} from 'react-icons/md'
 import * as Yup from 'yup'
-import {addDoc, doc, updateDoc, collection} from 'firebase/firestore'
+import {doc, updateDoc, collection, setDoc} from 'firebase/firestore'
 import {Alert, Button, TextField} from '@mui/material'
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {Field, Form, Formik, FormikHelpers} from 'formik'
@@ -58,8 +58,11 @@ const TaskManagement: FC = () => {
       if (task) {
         await updateDoc(doc(db, 'task', task.id), {...taskData})
       } else {
-        await addDoc(collection(db, 'task'), {
+        const newDocRef = doc(collection(db, 'tasks'))
+
+        await setDoc(newDocRef, {
           ...taskData,
+          id: newDocRef.id,
           isDone: false,
           user: user!.uid,
           date: formatDate(dateForChecking),

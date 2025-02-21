@@ -22,7 +22,7 @@ const AppRoutes: FC = () => {
         <Route path="/" element={<HomePage />} />
 
         <Route
-          path="/task_management/:date"
+          path="/edit_task/:date/:taskId"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <TaskManagement />
@@ -30,7 +30,7 @@ const AppRoutes: FC = () => {
           }
         />
         <Route
-          path="/task_management/:date/:taskId"
+          path="/create_task/:date"
           element={
             <SecureRoute redirectTo="/" isRedirection={!user}>
               <TaskManagement />

@@ -1,5 +1,5 @@
-import {doc} from 'firebase/firestore'
-import {useDocument} from 'react-firebase-hooks/firestore'
+import {query, where, collection} from 'firebase/firestore'
+import {useCollectionData} from 'react-firebase-hooks/firestore'
 import {useAuthState} from 'react-firebase-hooks/auth'
 
 import {db} from '../config/firebase'
@@ -12,16 +12,18 @@ interface UseCertainTask {
 
 export const useCertainTask = ({
   taskId,
-}: UseCertainTask): [TaskResponse | null, boolean] => {
+}: UseCertainTask): [TaskResponse | undefined, boolean] => {
   const [user] = useAuthState(auth)
 
-  const [data, isFetching] = useDocument(
-    taskId ? doc(db, 'task', taskId) : null
+  const [data, isFetching] = useCollectionData(
+    taskId && user?.uid
+      ? query(
+          collection(db, 'task'),
+          where('id', '==', taskId),
+          where('user', '==', user.uid)
+        )
+      : null
   )
 
-  if (!data?.exists() || data.data().userId !== user?.uid) {
-    return [null, isFetching]
-  }
-
-  return [{...(data.data() as TaskResponse), id: data.id}, isFetching]
+  return [data?.[0] as TaskResponse, isFetching]
 }

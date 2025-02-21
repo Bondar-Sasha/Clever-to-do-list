@@ -11,14 +11,13 @@ const TaskPage: FC = () => {
   const params = useParams<Params>()
 
   const [task, taskFetching] = useCertainTask({taskId: params?.taskId})
-
   if (!params?.taskId) {
     return <NotFoundMask label="Task" />
   }
-
   if (taskFetching) {
     return <DownloadMask />
   }
+
   if (!task) {
     return <NotFoundMask label="Task" />
   }
@@ -38,7 +37,7 @@ const TaskPage: FC = () => {
         <h1 className="text-3xl font-bold grow">Task</h1>
         <FaPenAlt
           className="text-theme cursor-pointer text-xl"
-          onClick={() => navigate(`/task_management/${task.date}/${task.id}`)}
+          onClick={() => navigate(`/edit_task/${task.date}/${task.id}`)}
         />
       </header>
       <div className="stretching flex items-center flex-col w-full">

@@ -1,6 +1,6 @@
 import {collection, query, where} from 'firebase/firestore'
 import {endOfMonth, startOfMonth} from 'date-fns'
-import {useCollection} from 'react-firebase-hooks/firestore'
+import {useCollectionData} from 'react-firebase-hooks/firestore'
 
 import {db} from '../config/firebase'
 import {IDate, TaskResponse} from '../types'
@@ -23,7 +23,7 @@ export function useTasks(): UseTasksResponse {
   const dateRestrictions = getMonthStartAndEnd(new Date())
   const [user] = useAuthState(auth)
 
-  const [data, isFetching] = useCollection(
+  const [data, isFetching] = useCollectionData(
     user?.uid
       ? query(
           collection(db, 'task'),
@@ -36,19 +36,18 @@ export function useTasks(): UseTasksResponse {
   if (!data) {
     return [null, isFetching]
   }
-  const preparedResponse: UseTasksResponse[0] = data.docs.reduce(
-    (acc, doc) => {
-      const taskResponse = doc.data() as Omit<TaskResponse, 'id'>
-      const taskDate = taskResponse.date
+  const preparedResponse: UseTasksResponse[0] = (data as TaskResponse[]).reduce(
+    (acc: Record<IDate, TaskResponse[]>, task) => {
+      const taskDate = task.date
 
       if (!acc[taskDate]) {
         acc[taskDate] = []
       }
 
-      acc[taskDate].push({...taskResponse, id: doc.id})
+      acc[taskDate].push(task)
       return acc
     },
-    {} as Record<IDate, TaskResponse[]>
+    {}
   )
 
   return [preparedResponse, isFetching] as UseTasksResponse
