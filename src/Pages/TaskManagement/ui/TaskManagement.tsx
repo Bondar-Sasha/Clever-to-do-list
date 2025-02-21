@@ -3,12 +3,12 @@ import {useNavigate, useParams} from 'react-router-dom'
 import {MdExpandLess} from 'react-icons/md'
 import * as Yup from 'yup'
 import {addDoc, doc, updateDoc, collection} from 'firebase/firestore'
+import {Alert, Button, TextField} from '@mui/material'
+import {useAuthState} from 'react-firebase-hooks/auth'
+import {Field, Form, Formik, FormikHelpers} from 'formik'
 
 import {auth, db, formatDate, Params, useCertainTask} from '@/Shared'
 import {DownloadMask, NotFoundMask} from '@/Widgets'
-import {Field, Form, Formik, FormikHelpers} from 'formik'
-import {Alert, Button, TextField} from '@mui/material'
-import {useAuthState} from 'react-firebase-hooks/auth'
 
 export interface TaskFormData {
   title: string
@@ -32,39 +32,21 @@ const TaskManagement: FC = () => {
   const params = useParams<Params>()
   const [task, taskFetching] = useCertainTask({taskId: params.taskId})
 
-  const notFoundUI = (
-    <div>
-      <header className="flex items-center justify-between mb-48">
-        <MdExpandLess
-          className="mr-4 -rotate-90 text-2xl cursor-pointer"
-          onClick={() => {
-            navigate('/', {
-              state: null,
-              replace: true,
-            })
-          }}
-        />
-        <h1 className="text-3xl font-bold grow">Task management</h1>
-      </header>
-      <NotFoundMask label="There is no such task" />
-    </div>
-  )
-
   if (!params?.date) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
 
   const dateForChecking = new Date(params.date)
 
   if (isNaN(dateForChecking.getTime())) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
 
   if (taskFetching) {
     return <DownloadMask />
   }
   if (!task && params.taskId) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
 
   const onSubmit = async (

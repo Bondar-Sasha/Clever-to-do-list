@@ -8,7 +8,7 @@ import {Button, Checkbox} from '@mui/material'
 
 import styles from '../styles/home.module.css'
 import {auth, db, formatDate, generateDates, IDate, useTasks} from '@/Shared'
-import {DownloadMask, NotFoundMask} from '@/Widgets'
+import {DownloadMask} from '@/Widgets'
 
 const thisDay = formatDate(new Date())
 
@@ -157,7 +157,7 @@ const HomePage: FC = () => {
                   }}
                 />
                 <div
-                  className="text-xl mx-3 hover:underline"
+                  className="text-xl mx-3 hover:underline text-ellipsis overflow-hidden w-4/5"
                   onClick={() => navigate(`/tasks/${id}`)}
                 >
                   {title}
@@ -169,7 +169,9 @@ const HomePage: FC = () => {
               </div>
             ))
           ) : (
-            <NotFoundMask label="There are no tasks for this day" />
+            <div className="stretching flex-center">
+              <span className="text-2xl">There are no tasks for this day</span>
+            </div>
           )}
         </div>
         <Button

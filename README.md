@@ -38,9 +38,9 @@ https://clever-to-do-list-608f2.web.app/
 ## Apps routes
 
 - `/`: Home page.
-- `/tasks/:date/:taskId"`: Particular task page.
-- `/edit_task/:date/:taskId`: Page for editing your task.
-- `/create_task/:date`: Page for creating task.
+- `/tasks/:taskId"`: Particular task page.
+- `/task_management/:date/:taskId`: Page for editing your task.
+- `/task_management/:date`: Page for creating task.
 - `/auth/registration`: Register page.
 - `/auth/login`: Login page.
 
