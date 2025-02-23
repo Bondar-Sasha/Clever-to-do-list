@@ -10,35 +10,19 @@ const TaskPage: FC = () => {
   const navigate = useNavigate()
   const params = useParams<Params>()
 
-  const {data:task, isFetching:taskFetching} = useCertainTask({taskId: params?.taskId})
-
-  const notFoundUI = (
-    <div>
-      <header className="flex items-center justify-between mb-48">
-        <MdExpandLess
-          className="mr-4 -rotate-90 text-2xl cursor-pointer"
-          onClick={() => {
-            navigate('/', {
-              state: null,
-              replace: true,
-            })
-          }}
-        />
-        <h1 className="text-3xl font-bold grow">Task</h1>
-      </header>
-      <NotFoundMask label="There is no such task" />
-    </div>
-  )
+  const {data: task, isFetching: taskFetching} = useCertainTask({
+    taskId: params?.taskId,
+  })
 
   if (!params?.taskId) {
-    return notFoundUI
+    return <NotFoundMask label="Task" />
   }
 
   if (taskFetching) {
     return <DownloadMask />
   }
   if (!task) {
-    return notFoundUI
+    return <NotFoundMask label="Task" />
   }
 
   return (

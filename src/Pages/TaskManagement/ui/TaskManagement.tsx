@@ -33,38 +33,20 @@ const TaskManagement: FC = () => {
   const params = useParams<Params>()
   const {data: task, isFetching} = useCertainTask({taskId: params.taskId})
 
-  const notFoundUI = (
-    <div>
-      <header className="flex items-center justify-between mb-48">
-        <MdExpandLess
-          className="mr-4 -rotate-90 text-2xl cursor-pointer"
-          onClick={() => {
-            navigate('/', {
-              state: null,
-              replace: true,
-            })
-          }}
-        />
-        <h1 className="text-3xl font-bold grow">Task management</h1>
-      </header>
-      <NotFoundMask label="There is no such task" />
-    </div>
-  )
-
   if (!params?.date) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
 
   const dateForChecking = new Date(params.date)
 
   if (isNaN(dateForChecking.getTime())) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
   if (isFetching) {
     return <DownloadMask />
   }
   if (!task && params.taskId) {
-    return notFoundUI
+    return <NotFoundMask label="Task management" />
   }
 
   const onSubmit = async (
