@@ -2,7 +2,6 @@
   overflow: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  position: relative;
 }
 
 .daysContainer::-webkit-scrollbar {
