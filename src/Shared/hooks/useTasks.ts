@@ -34,22 +34,22 @@ export const useTasks = (): UseTasksResponse => {
         )
       : null
   )
+  console.log(data)
   if (!data) {
     return {data: null, isFetching}
   }
-  const preparedResponse: UseTasksResponse[0] = (data as TaskResponse[]).reduce(
-    (acc: Record<IDate, TaskResponse[]>, task) => {
-      const taskDate = task.date
+  const preparedResponse: UseTasksResponse['data'] = (
+    data as TaskResponse[]
+  ).reduce((acc: Record<IDate, TaskResponse[]>, task) => {
+    const taskDate = task.date
 
-      if (!acc[taskDate]) {
-        acc[taskDate] = []
-      }
+    if (!acc[taskDate]) {
+      acc[taskDate] = []
+    }
 
-      acc[taskDate].push(task)
-      return acc
-    },
-    {}
-  )
+    acc[taskDate].push(task)
+    return acc
+  }, {})
 
   return {data: preparedResponse, isFetching}
 }

@@ -58,7 +58,7 @@ const TaskManagement: FC = () => {
       if (task) {
         await updateDoc(doc(db, 'task', task.id), {...taskData})
       } else {
-        const newDocRef = doc(collection(db, 'tasks'))
+        const newDocRef = doc(collection(db, 'task'))
 
         await setDoc(newDocRef, {
           ...taskData,
