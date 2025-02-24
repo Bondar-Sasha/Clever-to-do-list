@@ -1,0 +1,6 @@
+export * from './Home'
+export * from './Login'
+export * from './Register'
+export * from './NotFoundPage'
+export * from './Task'
+export * from './TaskManagement'
