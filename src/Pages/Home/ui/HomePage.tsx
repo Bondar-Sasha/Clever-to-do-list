@@ -163,7 +163,7 @@ const HomePage: FC = () => {
                   {title}
                 </div>
                 <FaPenAlt
-                  className="text-theme cursor-pointer w-8 text-xl"
+                  className="text-theme cursor-pointer text-xl"
                   onClick={() => navigate(`/edit_task/${date}/${id}`)}
                 />
               </div>

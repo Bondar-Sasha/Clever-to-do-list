@@ -13,14 +13,13 @@ const TaskPage: FC = () => {
   const {data: task, isFetching: taskFetching} = useCertainTask({
     taskId: params?.taskId,
   })
-
   if (!params?.taskId) {
     return <NotFoundMask label="Task" />
   }
-
   if (taskFetching) {
     return <DownloadMask />
   }
+
   if (!task) {
     return <NotFoundMask label="Task" />
   }
