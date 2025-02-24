@@ -40,7 +40,7 @@ const HomePage: FC = () => {
   const [pickedDay, setPickedDay] = useState<IDate>(thisDay)
   const pickedDayRef = useRef<HTMLDivElement | null>(null)
 
-  const [data, dataFetching] = useTasks()
+  const {data, isFetching} = useTasks()
 
   useEffect(() => {
     if (!state) {
@@ -58,7 +58,7 @@ const HomePage: FC = () => {
       behavior: 'instant',
       inline: 'center',
     })
-  }, [dataFetching])
+  }, [isFetching])
 
   if (!user) {
     return (
@@ -76,7 +76,7 @@ const HomePage: FC = () => {
     )
   }
 
-  if (dataFetching) {
+  if (isFetching) {
     return <DownloadMask />
   }
 
@@ -157,14 +157,14 @@ const HomePage: FC = () => {
                   }}
                 />
                 <div
-                  className="text-xl mx-3 hover:underline text-ellipsis overflow-hidden w-4/5"
+                  className="text-xl mx-3 hover:underline text-ellipsis overflow-hidden w-4/5 whitespace-nowrap"
                   onClick={() => navigate(`/tasks/${id}`)}
                 >
                   {title}
                 </div>
                 <FaPenAlt
-                  className="text-theme cursor-pointer text-xl"
-                  onClick={() => navigate(`/task_management/${date}/${id}`)}
+                  className="text-theme cursor-pointer w-8 text-xl"
+                  onClick={() => navigate(`/edit_task/${date}/${id}`)}
                 />
               </div>
             ))
@@ -178,7 +178,7 @@ const HomePage: FC = () => {
           variant="outlined"
           sx={{width: '100%', height: '40px'}}
           onClick={() => {
-            navigate(`/task_management/${pickedDay}/`)
+            navigate(`/create_task/${pickedDay}/`)
           }}
         >
           Add task

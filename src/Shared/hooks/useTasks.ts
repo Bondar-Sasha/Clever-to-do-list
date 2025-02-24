@@ -8,9 +8,10 @@ import {formatDate} from '../utils'
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {auth} from '../api'
 
-type UseTasksResponse =
-  | [Record<IDate, TaskResponse[]>, boolean]
-  | [null, boolean]
+interface UseTasksResponse {
+  data: Record<IDate, TaskResponse[]> | null | undefined
+  isFetching: boolean
+}
 
 function getMonthStartAndEnd(date: Date) {
   const startOfMonthDate = startOfMonth(date)
@@ -19,7 +20,7 @@ function getMonthStartAndEnd(date: Date) {
   return [formatDate(startOfMonthDate), formatDate(endOfMonthDate)]
 }
 
-export function useTasks(): UseTasksResponse {
+export const useTasks = (): UseTasksResponse => {
   const dateRestrictions = getMonthStartAndEnd(new Date())
   const [user] = useAuthState(auth)
 
@@ -34,9 +35,9 @@ export function useTasks(): UseTasksResponse {
       : null
   )
   if (!data) {
-    return [null, isFetching]
+    return {data: null, isFetching}
   }
-  const preparedResponse: UseTasksResponse[0] = data.docs.reduce(
+  const preparedResponse: UseTasksResponse['data'] = data.docs.reduce(
     (acc, doc) => {
       const taskResponse = doc.data() as Omit<TaskResponse, 'id'>
       const taskDate = taskResponse.date
@@ -51,5 +52,5 @@ export function useTasks(): UseTasksResponse {
     {} as Record<IDate, TaskResponse[]>
   )
 
-  return [preparedResponse, isFetching] as UseTasksResponse
+  return {data: preparedResponse, isFetching}
 }

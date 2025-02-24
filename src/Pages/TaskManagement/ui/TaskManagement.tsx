@@ -2,13 +2,13 @@ import {FC, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {MdExpandLess} from 'react-icons/md'
 import * as Yup from 'yup'
-import {addDoc, doc, updateDoc, collection} from 'firebase/firestore'
-import {Alert, Button, TextField} from '@mui/material'
 import {useAuthState} from 'react-firebase-hooks/auth'
-import {Field, Form, Formik, FormikHelpers} from 'formik'
+import {doc, updateDoc, collection, setDoc} from 'firebase/firestore'
+import {Alert, Button, TextField} from '@mui/material'
 
 import {auth, db, formatDate, Params, useCertainTask} from '@/Shared'
 import {DownloadMask, NotFoundMask} from '@/Widgets'
+import {Field, Form, Formik, FormikHelpers} from 'formik'
 
 export interface TaskFormData {
   title: string
@@ -27,10 +27,11 @@ const initialValues: TaskFormData = {
 
 const TaskManagement: FC = () => {
   const navigate = useNavigate()
+
   const [user] = useAuthState(auth)
   const [fetching, setFetching] = useState<boolean>(false)
   const params = useParams<Params>()
-  const [task, taskFetching] = useCertainTask({taskId: params.taskId})
+  const {data: task, isFetching} = useCertainTask({taskId: params.taskId})
 
   if (!params?.date) {
     return <NotFoundMask label="Task management" />
@@ -41,8 +42,7 @@ const TaskManagement: FC = () => {
   if (isNaN(dateForChecking.getTime())) {
     return <NotFoundMask label="Task management" />
   }
-
-  if (taskFetching) {
+  if (isFetching) {
     return <DownloadMask />
   }
   if (!task && params.taskId) {
@@ -58,8 +58,10 @@ const TaskManagement: FC = () => {
       if (task) {
         await updateDoc(doc(db, 'task', task.id), {...taskData})
       } else {
-        await addDoc(collection(db, 'task'), {
+        const newRef = doc(collection(db, 'task'))
+        await setDoc(newRef, {
           ...taskData,
+          id: newRef.id,
           isDone: false,
           user: user!.uid,
           date: formatDate(dateForChecking),
